@@ -159,7 +159,7 @@ public class BungeeManager {
         Server server = Bukkit.getServer();
 
         // check for incoming messages from the bungeecord version of this plugin
-        String groupId = plugin.getName();
+        String groupId = "fastlogin";
         String forceChannel = NamespaceKey.getCombined(groupId, LoginActionMessage.FORCE_CHANNEL);
         server.getMessenger().registerIncomingPluginChannel(plugin, forceChannel, new BungeeListener(plugin));
 

@@ -37,6 +37,7 @@ import com.github.games647.fastlogin.velocity.task.AsyncPremiumCheck;
 import com.github.games647.fastlogin.velocity.task.FloodgateAuthTask;
 import com.github.games647.fastlogin.velocity.task.ForceLoginTask;
 import com.velocitypowered.api.event.EventTask;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
@@ -69,7 +70,7 @@ public class ConnectListener {
         this.antiBotService = antiBotService;
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.FIRST)
     public EventTask onPreLogin(PreLoginEvent preLoginEvent) {
         if (!preLoginEvent.getResult().isAllowed()) {
             return null;
@@ -102,31 +103,34 @@ public class ConnectListener {
 
     @Subscribe
     public void onGameProfileRequest(GameProfileRequestEvent event) {
-        if (event.isOnlineMode()) {
-            LoginSession session = plugin.getSession().get(event.getConnection().getRemoteAddress());
-            if (session == null) {
-                plugin.getLog().warn("No active login session found for player {}", event.getUsername());
-                return;
-            }
+        LoginSession session = plugin.getSession().get(event.getConnection().getRemoteAddress());
+        if (session == null) {
+            plugin.getLog().warn("No active login session found for player {}", event.getUsername());
+            return;
+        }
 
-            UUID verifiedUUID = event.getGameProfile().getId();
-            String verifiedUsername = event.getUsername();
-            session.setUuid(verifiedUUID);
-            session.setVerifiedUsername(verifiedUsername);
+        UUID verifiedUUID = event.getGameProfile().getId();
+        String verifiedUsername = event.getUsername();
+        session.setUuid(verifiedUUID);
+        session.setVerifiedUsername(verifiedUsername);
 
-            StoredProfile playerProfile = session.getProfile();
-            playerProfile.setId(verifiedUUID);
-            if (!plugin.getCore().getConfig().get("premiumUuid", true)) {
-                UUID offlineUUID = UUIDAdapter.generateOfflineId(playerProfile.getName());
-                event.setGameProfile(event.getGameProfile().withId(offlineUUID));
-                plugin.getLog().info("Overridden UUID from {} to {} (based of {}) on {}",
-                        verifiedUUID, offlineUUID, verifiedUsername, event.getConnection());
-            }
+        StoredProfile playerProfile = session.getProfile();
+        playerProfile.setId(verifiedUUID);
 
-            if (!plugin.getCore().getConfig().get("forwardSkin", true)) {
-                List<Property> newProp = removeSkin(event.getGameProfile().getProperties());
-                event.setGameProfile(event.getGameProfile().withProperties(newProp));
-            }
+        if (!plugin.getCore().getConfig().get("premiumUuid", true)) {
+            UUID offlineUUID = UUIDAdapter.generateOfflineId(playerProfile.getName());
+            event.setGameProfile(event.getGameProfile().withId(offlineUUID));
+            plugin.getLog().info("Overridden UUID from {} to {} (based of {}) on {}",
+                    verifiedUUID, offlineUUID, verifiedUsername, event.getConnection());
+        } else {
+            plugin.getLog().info("Set UUID premium {} to {}!",
+                    verifiedUUID, verifiedUsername);
+            event.setGameProfile(event.getGameProfile().withId(verifiedUUID));
+        }
+
+        if (!plugin.getCore().getConfig().get("forwardSkin", true)) {
+            List<Property> newProp = removeSkin(event.getGameProfile().getProperties());
+            event.setGameProfile(event.getGameProfile().withProperties(newProp));
         }
     }
 

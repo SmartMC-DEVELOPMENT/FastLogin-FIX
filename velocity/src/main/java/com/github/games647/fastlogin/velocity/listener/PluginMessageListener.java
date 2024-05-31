@@ -55,7 +55,7 @@ public class PluginMessageListener {
     public PluginMessageListener(FastLoginVelocity plugin) {
         this.plugin = plugin;
 
-        String prefix = plugin.getName();
+        String prefix = "fastlogin";
         this.successChannel = MinecraftChannelIdentifier.create(prefix, SuccessMessage.SUCCESS_CHANNEL).getId();
         this.changeChannel = MinecraftChannelIdentifier.create(prefix, ChangePremiumMessage.CHANGE_CHANNEL).getId();
     }
@@ -63,7 +63,8 @@ public class PluginMessageListener {
     @Subscribe
     public void onPluginMessage(PluginMessageEvent pluginMessageEvent) {
         String channel = pluginMessageEvent.getIdentifier().getId();
-        if (!pluginMessageEvent.getResult().isAllowed() || !channel.startsWith(plugin.getName().toLowerCase())) {
+        System.out.println("RECEIVED MSG=" + channel);
+        if (!channel.startsWith("fastlogin")) {
             return;
         }
 

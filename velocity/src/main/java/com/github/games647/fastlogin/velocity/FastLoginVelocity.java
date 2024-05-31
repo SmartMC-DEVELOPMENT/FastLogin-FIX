@@ -68,8 +68,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
 //TODO: Support for floodgate
-@Plugin(id = PomData.NAME, name = PomData.DISPLAY_NAME, description = PomData.DESCRIPTION, url = PomData.URL,
-        version = PomData.VERSION, authors = {"games647", "https://github.com/games647/FastLogin/graphs/contributors"})
+@Plugin(id = "fastlogin-velocity", name = "fastloginvelocity", description = "the madafakin login plugin", url = "sio",
+        version = "SmartMC", authors = {"games647"})
 public class FastLoginVelocity implements PlatformPlugin<CommandSource> {
 
     private final ProxyServer server;
@@ -113,8 +113,8 @@ public class FastLoginVelocity implements PlatformPlugin<CommandSource> {
         server.getEventManager().register(this, new PluginMessageListener(this));
 
         ChannelRegistrar channelRegistry = server.getChannelRegistrar();
-        channelRegistry.register(MinecraftChannelIdentifier.create(getName(), ChangePremiumMessage.CHANGE_CHANNEL));
-        channelRegistry.register(MinecraftChannelIdentifier.create(getName(), SuccessMessage.SUCCESS_CHANNEL));
+        channelRegistry.register(MinecraftChannelIdentifier.create("fastlogin", ChangePremiumMessage.CHANGE_CHANNEL));
+        channelRegistry.register(MinecraftChannelIdentifier.create("fastlogin", SuccessMessage.SUCCESS_CHANNEL));
     }
 
     @Subscribe
@@ -126,7 +126,7 @@ public class FastLoginVelocity implements PlatformPlugin<CommandSource> {
 
     @Override
     public String getName() {
-        return PomData.NAME;
+        return "fastloginvelocity";
     }
 
     @Override
